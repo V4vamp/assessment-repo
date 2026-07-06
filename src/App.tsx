@@ -1,29 +1,26 @@
 
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Toast } from "./components/ui/toast";
+
+import { Toaster } from "./components/ui/toaster";
 import { TooltipProvider } from "./components/ui/tooltip";
 import NotFound from "./pages/not-found";
 import Landing from "./pages/LandingPage";
+import Restaurants from "./pages/Resturants";
+
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-// import Home from "./pages/Home";
-// import Favorites from "./pages/Favorites";
-
-const queryClient = new QueryClient();
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <BrowserRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+    <TooltipProvider>
+        <BrowserRouter>
           <Routes>
             <Route path="/" element={<Landing />} />
+            <Route path="/restaurants" element={<Restaurants />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
-        <Toast />
+        <Toaster />
       </TooltipProvider>
-    </QueryClientProvider>
   );
 }
 

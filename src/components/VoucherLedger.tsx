@@ -22,7 +22,7 @@ export function VoucherLedger({ pointsLedger }: VoucherLedgerProps) {
   );
 
   return (
-    <div className="bg-card rounded-2xl border border-card-border shadow-md overflow-hidden flex flex-col h-full max-h-[calc(100vh-6rem)] sticky top-24">
+    <div className="bg-card w-1/4 rounded-2xl border border-card-border shadow-md overflow-hidden flex flex-col h-full max-h-[calc(100vh-6rem)] fixed top-24">
       <div className="p-6 bg-primary/10 border-b border-primary/20">
         <div className="flex items-center gap-2 mb-2 text-primary">
           <Coins className="w-5 h-5" />

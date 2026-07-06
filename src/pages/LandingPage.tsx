@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from "react-router-dom";
-import { ShoppingBag, MapPin, Search, ArrowRight, Sparkles } from 'lucide-react';
+import { ShoppingBag, MapPin, Search, ArrowRight } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Avatar, AvatarFallback } from '../components/ui/avatar';
 import { RatingStars } from '../components/RatingStars';
@@ -53,15 +53,15 @@ export default function Landing() {
       <header className="sticky top-0 z-50 w-full bg-background/80 backdrop-blur-md border-b border-border">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground shadow-md">
+            <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white shadow-md">
               <ShoppingBag className="h-6 w-6" />
             </div>
             <span className="text-xl font-bold tracking-tight text-foreground">
               Local<span className="text-primary">Buka</span>
             </span>
           </div>
-          <Link to="/app">
-            <Button className="rounded-full font-semibold">
+          <Link to="/restaurants">
+            <Button className="rounded-full font-semibold border-white text-white hover:bg-white hover:text-primary hover:border hover:border-primary cursor-pointer transition-colors gap-2">
               Find Restaurants
             </Button>
           </Link>
@@ -69,19 +69,11 @@ export default function Landing() {
       </header>
 
       <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-primary/15" />
-        <div
-          className="absolute inset-0 opacity-[0.06]"
-          style={{
-            backgroundImage:
-              'radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)',
-            backgroundSize: '28px 28px',
-          }}
-        />
+        <div className="absolute inset-0 bg-primary/20" />
 
-        <div className="relative container mx-auto px-4 py-24 md:py-36 flex flex-col items-center text-center gap-6">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-semibold">
-            <Sparkles className="w-4 h-4" />
+        <div className="relative container mx-auto px-4 py-24 md:py-20 flex flex-col items-center text-center gap-6">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 text-primary text-sm font-semibold">
+            
             Nigeria's favorite buka finder
           </div>
 
@@ -92,13 +84,13 @@ export default function Landing() {
           </h1>
 
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl leading-relaxed">
-            Discover the best local restaurants near you — from streetside amala joints
-            to five-star suya spots — rated by thousands of real Nigerian foodies.
+            Discover the best local restaurants near you; from streetside amala joints
+            to five-star suya spots, rated by thousands of real Nigerian foodies.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center gap-3 mt-4">
             <Link to="/app">
-              <Button size="lg" className="rounded-full px-8 h-14 text-base font-bold shadow-lg shadow-primary/20 gap-2">
+              <Button size="lg" className="rounded-full px-8 h-14 text-base font-bold shadow-lg shadow-primary/20 gap-2 bg-transparent border border-primary text-primary hover:bg-primary hover:text-white transition-colors cursor-pointer">
                 <Search className="w-5 h-5" />
                 Find a restaurant near you
                 <ArrowRight className="w-4 h-4" />
@@ -129,7 +121,7 @@ export default function Landing() {
                 </div>
                 <div className="h-10 w-px bg-border hidden sm:block" />
                 <div className="text-center">
-                  <p className="text-3xl font-extrabold text-foreground">4.6★</p>
+                  <p className="text-3xl font-extrabold text-foreground">4.6</p>
                   <p className="text-sm text-muted-foreground font-medium">Average rating</p>
                 </div>
               </>
@@ -273,7 +265,7 @@ export default function Landing() {
                       </p>
                     </div>
                     {user.referredBy && (
-                      <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-accent/10 text-accent-foreground border border-accent/20">
+                      <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-accent/10 text-primary border border-accent/20">
                         Referred member
                       </span>
                     )}
@@ -291,10 +283,10 @@ export default function Landing() {
             Hungry? Let's find your next meal.
           </h2>
           <p className="text-muted-foreground max-w-lg">
-            Browse local bukas by cuisine, price, and rating — and start earning loyalty points on every visit.
+            Browse local bukas by cuisine, price, and rating, and start earning loyalty points on every visit.
           </p>
-          <Link to="/app">
-            <Button size="lg" className="rounded-full px-8 h-14 text-base font-bold shadow-lg shadow-primary/20 gap-2">
+          <Link to="/restaurants">
+            <Button size="lg" className="rounded-full px-8 h-14 text-base font-bold bg-transparent border-none text-primary hover:bg-primary hover:text-white transition-colors cursor-pointer">
               Explore restaurants
               <ArrowRight className="w-4 h-4" />
             </Button>
