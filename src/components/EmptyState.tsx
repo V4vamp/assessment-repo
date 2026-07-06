@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { UtensilsCrossed } from 'lucide-react';
 
 export function EmptyState() {

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { useCallback } from 'react';
-import { useToast } from '../hooks/use-toast';
+import { useToast } from '../components/ui/use-toast';
 import { fakeToggleFavoriteRequest } from '../services/fakeApis';
 
 export function useFavorite(

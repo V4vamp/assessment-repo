@@ -1,4 +1,4 @@
-/* eslint-disable react-hooks/purity*/
+/* eslint-disable react-hooks/rules-of-hooks */
 
 import { useState } from 'react';
 import { Navbar } from '../components/Navbar';

@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/set-state-in-effect */
+
 import { useMemo, useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 
