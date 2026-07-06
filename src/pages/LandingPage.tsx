@@ -1,9 +1,13 @@
-import { Link } from 'wouter';
+import { useEffect, useState } from 'react';
+import { Link } from "react-router-dom";
 import { ShoppingBag, MapPin, Search, ArrowRight, Sparkles } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '../components/ui/button';
 import { Avatar, AvatarFallback } from '../components/ui/avatar';
 import { RatingStars } from '../components/RatingStars';
-import { restaurants, reviews, users } from '../data/mockData';
+import type { Restaurant, Review, User } from '../types/types';
+import { fetchRestaurants } from '../api/restaurants';
+import { fetchReviews } from '../api/reviews';
+import { fetchUsers } from '../api/users';
 
 function getInitials(name: string) {
   return name
@@ -19,6 +23,28 @@ function formatDate(iso: string) {
 }
 
 export default function Landing() {
+  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    setIsLoading(true);
+    Promise.all([fetchRestaurants(), fetchReviews(), fetchUsers()]).then(
+      ([restaurantsData, reviewsData, usersData]) => {
+        if (cancelled) return;
+        setRestaurants(restaurantsData);
+        setReviews(reviewsData);
+        setUsers(usersData);
+        setIsLoading(false);
+      }
+    );
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const restaurantsById = Object.fromEntries(restaurants.map(r => [r.id, r]));
   const usersById = Object.fromEntries(users.map(u => [u.id, u]));
 
@@ -34,7 +60,7 @@ export default function Landing() {
               Local<span className="text-primary">Buka</span>
             </span>
           </div>
-          <Link href="/app">
+          <Link to="/app">
             <Button className="rounded-full font-semibold">
               Find Restaurants
             </Button>
@@ -44,10 +70,18 @@ export default function Landing() {
 
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-primary/15" />
-        
+        <div
+          className="absolute inset-0 opacity-[0.06]"
+          style={{
+            backgroundImage:
+              'radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)',
+            backgroundSize: '28px 28px',
+          }}
+        />
 
         <div className="relative container mx-auto px-4 py-24 md:py-36 flex flex-col items-center text-center gap-6">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-primary text-sm font-semibold">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-semibold">
+            <Sparkles className="w-4 h-4" />
             Nigeria's favorite buka finder
           </div>
 
@@ -63,7 +97,7 @@ export default function Landing() {
           </p>
 
           <div className="flex flex-col sm:flex-row items-center gap-3 mt-4">
-            <Link href="/app">
+            <Link to="/app">
               <Button size="lg" className="rounded-full px-8 h-14 text-base font-bold shadow-lg shadow-primary/20 gap-2">
                 <Search className="w-5 h-5" />
                 Find a restaurant near you
@@ -73,20 +107,33 @@ export default function Landing() {
           </div>
 
           <div className="flex items-center gap-8 mt-10 flex-wrap justify-center">
-            <div className="text-center">
-              <p className="text-3xl font-extrabold text-foreground">{restaurants.length}+</p>
-              <p className="text-sm text-muted-foreground font-medium">Restaurants listed</p>
-            </div>
-            <div className="h-10 w-px bg-border hidden sm:block" />
-            <div className="text-center">
-              <p className="text-3xl font-extrabold text-foreground">{users.length}k+</p>
-              <p className="text-sm text-muted-foreground font-medium">Happy foodies</p>
-            </div>
-            <div className="h-10 w-px bg-border hidden sm:block" />
-            <div className="text-center">
-              <p className="text-3xl font-extrabold text-foreground">4.6★</p>
-              <p className="text-sm text-muted-foreground font-medium">Average rating</p>
-            </div>
+            {isLoading ? (
+              <>
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <div key={i} className="flex flex-col items-center gap-2">
+                    <div className="h-8 w-16 bg-muted animate-pulse rounded" />
+                    <div className="h-4 w-24 bg-muted animate-pulse rounded" />
+                  </div>
+                ))}
+              </>
+            ) : (
+              <>
+                <div className="text-center">
+                  <p className="text-3xl font-extrabold text-foreground">{restaurants.length}+</p>
+                  <p className="text-sm text-muted-foreground font-medium">Restaurants listed</p>
+                </div>
+                <div className="h-10 w-px bg-border hidden sm:block" />
+                <div className="text-center">
+                  <p className="text-3xl font-extrabold text-foreground">{users.length}k+</p>
+                  <p className="text-sm text-muted-foreground font-medium">Happy foodies</p>
+                </div>
+                <div className="h-10 w-px bg-border hidden sm:block" />
+                <div className="text-center">
+                  <p className="text-3xl font-extrabold text-foreground">4.6★</p>
+                  <p className="text-sm text-muted-foreground font-medium">Average rating</p>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </section>
@@ -102,51 +149,80 @@ export default function Landing() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-          {reviews.map(review => {
-            const restaurant = restaurantsById[review.restaurantId];
-            const author = usersById[review.userId];
-            return (
-              <div
-                key={review.id}
-                className="flex flex-col gap-4 bg-card border border-card-border rounded-2xl p-6 shadow-sm hover:shadow-lg transition-shadow"
-              >
-                <div className="flex items-center justify-between">
-                  <RatingStars rating={review.rating} size={16} />
-                  <span className="text-xs text-muted-foreground font-medium">{formatDate(review.createdAt)}</span>
-                </div>
-
-                <p className="text-foreground text-base leading-relaxed">"{review.comment}"</p>
-
-                <div className="flex flex-wrap gap-1.5">
-                  {review.tags.map(tag => (
-                    <span
-                      key={tag}
-                      className="px-2 py-0.5 bg-muted/60 text-muted-foreground rounded text-xs font-medium border border-border/50"
-                    >
-                      #{tag}
-                    </span>
-                  ))}
-                </div>
-
-                <div className="flex items-center gap-3 mt-2 pt-4 border-t border-border">
-                  <Avatar className="h-10 w-10 border border-border">
-                    <AvatarFallback className="bg-primary/10 text-primary font-bold text-sm">
-                      {author ? getInitials(author.name) : '?'}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex flex-col">
-                    <span className="text-sm font-bold text-foreground">{author?.name ?? 'Anonymous'}</span>
-                    {restaurant && (
-                      <span className="text-xs text-muted-foreground flex items-center gap-1">
-                        <MapPin className="w-3 h-3" />
-                        {restaurant.name}
-                      </span>
-                    )}
+          {isLoading ? (
+            <>
+              {Array.from({ length: 2 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="flex flex-col gap-4 bg-card border border-card-border rounded-2xl p-6 shadow-sm"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="h-4 w-24 bg-muted animate-pulse rounded" />
+                    <div className="h-3 w-16 bg-muted animate-pulse rounded" />
+                  </div>
+                  <div className="h-4 w-full bg-muted animate-pulse rounded" />
+                  <div className="h-4 w-2/3 bg-muted animate-pulse rounded" />
+                  <div className="flex gap-1.5">
+                    <div className="h-5 w-14 bg-muted animate-pulse rounded" />
+                    <div className="h-5 w-16 bg-muted animate-pulse rounded" />
+                  </div>
+                  <div className="flex items-center gap-3 mt-2 pt-4 border-t border-border">
+                    <div className="h-10 w-10 rounded-full bg-muted animate-pulse" />
+                    <div className="flex flex-col gap-1.5">
+                      <div className="h-3.5 w-28 bg-muted animate-pulse rounded" />
+                      <div className="h-3 w-20 bg-muted animate-pulse rounded" />
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
+              ))}
+            </>
+          ) : (
+            reviews.map(review => {
+              const restaurant = restaurantsById[review.restaurantId];
+              const author = usersById[review.userId];
+              return (
+                <div
+                  key={review.id}
+                  className="flex flex-col gap-4 bg-card border border-card-border rounded-2xl p-6 shadow-sm hover:shadow-lg transition-shadow"
+                >
+                  <div className="flex items-center justify-between">
+                    <RatingStars rating={review.rating} size={16} />
+                    <span className="text-xs text-muted-foreground font-medium">{formatDate(review.createdAt)}</span>
+                  </div>
+
+                  <p className="text-foreground text-base leading-relaxed">"{review.comment}"</p>
+
+                  <div className="flex flex-wrap gap-1.5">
+                    {review.tags.map(tag => (
+                      <span
+                        key={tag}
+                        className="px-2 py-0.5 bg-muted/60 text-muted-foreground rounded text-xs font-medium border border-border/50"
+                      >
+                        #{tag}
+                      </span>
+                    ))}
+                  </div>
+
+                  <div className="flex items-center gap-3 mt-2 pt-4 border-t border-border">
+                    <Avatar className="h-10 w-10 border border-border">
+                      <AvatarFallback className="bg-primary/10 text-primary font-bold text-sm">
+                        {author ? getInitials(author.name) : '?'}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex flex-col">
+                      <span className="text-sm font-bold text-foreground">{author?.name ?? 'Anonymous'}</span>
+                      {restaurant && (
+                        <span className="text-xs text-muted-foreground flex items-center gap-1">
+                          <MapPin className="w-3 h-3" />
+                          {restaurant.name}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          )}
         </div>
       </section>
 
@@ -162,32 +238,49 @@ export default function Landing() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
-            {users.map(user => {
-              const userReviewCount = reviews.filter(r => r.userId === user.id).length;
-              return (
-                <div
-                  key={user.id}
-                  className="flex flex-col items-center text-center gap-3 bg-card border border-card-border rounded-2xl p-6 shadow-sm hover:-translate-y-1 transition-transform"
-                >
-                  <Avatar className="h-16 w-16 border-2 border-primary/20">
-                    <AvatarFallback className="bg-primary/10 text-primary font-bold text-lg">
-                      {getInitials(user.name)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <p className="font-bold text-foreground">{user.name}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {userReviewCount} {userReviewCount === 1 ? 'review' : 'reviews'} written
-                    </p>
+            {isLoading ? (
+              <>
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="flex flex-col items-center text-center gap-3 bg-card border border-card-border rounded-2xl p-6 shadow-sm"
+                  >
+                    <div className="h-16 w-16 rounded-full bg-muted animate-pulse" />
+                    <div className="flex flex-col items-center gap-2">
+                      <div className="h-4 w-24 bg-muted animate-pulse rounded" />
+                      <div className="h-3 w-32 bg-muted animate-pulse rounded" />
+                    </div>
                   </div>
-                  {user.referredBy && (
-                    <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-accent/10 text-accent-foreground border border-accent/20">
-                      Referred member
-                    </span>
-                  )}
-                </div>
-              );
-            })}
+                ))}
+              </>
+            ) : (
+              users.map(user => {
+                const userReviewCount = reviews.filter(r => r.userId === user.id).length;
+                return (
+                  <div
+                    key={user.id}
+                    className="flex flex-col items-center text-center gap-3 bg-card border border-card-border rounded-2xl p-6 shadow-sm hover:-translate-y-1 transition-transform"
+                  >
+                    <Avatar className="h-16 w-16 border-2 border-primary/20">
+                      <AvatarFallback className="bg-primary/10 text-primary font-bold text-lg">
+                        {getInitials(user.name)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <p className="font-bold text-foreground">{user.name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {userReviewCount} {userReviewCount === 1 ? 'review' : 'reviews'} written
+                      </p>
+                    </div>
+                    {user.referredBy && (
+                      <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-accent/10 text-accent-foreground border border-accent/20">
+                        Referred member
+                      </span>
+                    )}
+                  </div>
+                );
+              })
+            )}
           </div>
         </div>
       </section>
@@ -200,7 +293,7 @@ export default function Landing() {
           <p className="text-muted-foreground max-w-lg">
             Browse local bukas by cuisine, price, and rating — and start earning loyalty points on every visit.
           </p>
-          <Link href="/app">
+          <Link to="/app">
             <Button size="lg" className="rounded-full px-8 h-14 text-base font-bold shadow-lg shadow-primary/20 gap-2">
               Explore restaurants
               <ArrowRight className="w-4 h-4" />

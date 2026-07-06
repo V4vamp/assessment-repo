@@ -1,6 +1,4 @@
-import React from 'react';
-
-const TAGS = [
+const tags = [
   'All',
   'Nigerian Traditional',
   'Fast Food',
@@ -22,7 +20,7 @@ export function FilterTags({ activeFilter, onFilterChange }: FilterTagsProps) {
   return (
     <div className="w-full overflow-x-auto pb-2 scrollbar-hide">
       <div className="flex gap-2">
-        {TAGS.map(tag => (
+        {tags.map(tag => (
           <button
             key={tag}
             onClick={() => onFilterChange(tag)}
